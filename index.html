@@ -659,7 +659,6 @@ requestAnimationFrame(t=>{ catNext = t + CAT_SPEED; requestAnimationFrame(catAni
 /* ───── Star: random character + random quote ───── */
 const CHAR_SRC = ['char1.webp','char2.webp','char3.webp','char4.webp'];
 const BUBBLE_MAX = 250;  // characters shown before …
-const LONG_AT = 40;      // longer than this → bubble moves above the character
 CHAR_SRC.forEach(src=>{ const i=new Image(); i.src=src; });   // preload
 let lastChar=-1, lastQuote=null;
 function pickOther(n, last){ if(n<2) return 0; let i; do{ i=Math.floor(Math.random()*n); }while(i===last); return i; }
@@ -679,7 +678,7 @@ function showPop(){
     lastQuote = q.id; line = shorten(q.text);
   }
   bub.textContent = line;
-  $('pop').classList.toggle('long', Array.from(line).length > LONG_AT);
+  $('pop').classList.add('long');   // always: bubble above, character in the same spot
   bub.scrollTop = 0;
   [img,bub.parentElement].forEach(el=>{ el.style.animation='none'; void el.offsetWidth; el.style.animation=''; });  // replay
   $('pop').classList.add('open');
