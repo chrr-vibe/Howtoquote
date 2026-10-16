@@ -1,6 +1,6 @@
 /* How to quote — service worker
    Bump VERSION whenever you upload a new index.html so phones pick up the update. */
-const VERSION = 'howtoquote-v3';
+const VERSION = 'howtoquote-v4';
 const CORE = [
   './',
   './index.html',

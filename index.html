@@ -72,12 +72,23 @@
     animation:bubbleIn .25s .18s ease-out both;}
   .pop-bubble::after{content:"";position:absolute;left:-14px;bottom:18px;
     border-style:solid;border-width:0 14px 14px 0;border-color:transparent var(--accent) transparent transparent;}
+  /* long lines: wide bubble above the character, growing upward */
+  .pop.long{align-items:flex-end;padding-bottom:6vh;}
+  .pop.long .pop-bubble{left:0;right:0;width:auto;top:auto;bottom:304px;min-height:0;
+    display:block;white-space:pre-line;font-size:13.5px;padding:16px 18px;}
+  .pop.long .pop-text{max-height:calc(94vh - 362px);overflow-y:auto;}
+  .pop.long .pop-bubble::after{left:58px;bottom:-14px;border-width:14px 14px 0 0;
+    border-color:var(--accent) transparent transparent transparent;}
+  .pop.long .pop-bubble{animation-name:bubbleUp;}
+  @keyframes bubbleUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
   @keyframes charIn{from{opacity:0;transform:translateY(24px)}to{opacity:1;transform:none}}
   @keyframes bubbleIn{from{opacity:0;transform:scale(.85);transform-origin:left bottom}to{opacity:1;transform:none}}
   @media (max-width:360px){
     .pop-stage{width:300px;height:310px;}
     .pop-char{height:255px;}
     .pop-bubble{left:132px;width:166px;font-size:13px;}
+    .pop.long .pop-bubble{bottom:267px;}
+    .pop.long .pop-text{max-height:calc(94vh - 322px);}
   }
   .theme-btn{
     display:flex;align-items:center;gap:7px;border:2px solid var(--accent);background:transparent;color:var(--ink);
@@ -294,7 +305,7 @@
 <div class="pop" id="pop" role="dialog" aria-modal="true" aria-label="Random quote">
   <div class="pop-stage">
     <img class="pop-char" id="popChar" alt="">
-    <div class="pop-bubble" id="popBubble"></div>
+    <div class="pop-bubble"><div class="pop-text" id="popBubble"></div></div>
   </div>
 </div>
 
@@ -636,12 +647,13 @@ requestAnimationFrame(t=>{ catNext = t + CAT_SPEED; requestAnimationFrame(catAni
 
 /* ───── Star: random character + random quote ───── */
 const CHAR_SRC = ['char1.webp','char2.webp','char3.webp','char4.webp'];
-const BUBBLE_MAX = 20;   // characters shown before …
+const BUBBLE_MAX = 250;  // characters shown before …
+const LONG_AT = 40;      // longer than this → bubble moves above the character
 CHAR_SRC.forEach(src=>{ const i=new Image(); i.src=src; });   // preload
 let lastChar=-1, lastQuote=null;
 function pickOther(n, last){ if(n<2) return 0; let i; do{ i=Math.floor(Math.random()*n); }while(i===last); return i; }
 function shorten(text){
-  const chars = Array.from(text.replace(/\s+/g,' ').trim());
+  const chars = Array.from(text.replace(/[ \t]+/g,' ').replace(/ *\n\s*/g,'\n').trim());
   return chars.length>BUBBLE_MAX ? chars.slice(0,BUBBLE_MAX).join('').trimEnd()+'…' : chars.join('');
 }
 function showPop(){
@@ -656,7 +668,9 @@ function showPop(){
     lastQuote = q.id; line = shorten(q.text);
   }
   bub.textContent = line;
-  [img,bub].forEach(el=>{ el.style.animation='none'; void el.offsetWidth; el.style.animation=''; });  // replay
+  $('pop').classList.toggle('long', Array.from(line).length > LONG_AT);
+  bub.scrollTop = 0;
+  [img,bub.parentElement].forEach(el=>{ el.style.animation='none'; void el.offsetWidth; el.style.animation=''; });  // replay
   $('pop').classList.add('open');
 }
 function closePop(){ $('pop').classList.remove('open'); }
