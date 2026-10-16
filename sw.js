@@ -1,6 +1,6 @@
 /* How to quote — service worker
    Bump VERSION whenever you upload a new index.html so phones pick up the update. */
-const VERSION = 'howtoquote-v2';
+const VERSION = 'howtoquote-v3';
 const CORE = [
   './',
   './index.html',
@@ -9,7 +9,11 @@ const CORE = [
   './icon-512.png',
   './icon-maskable-512.png',
   './apple-touch-icon.png',
-  './favicon.png'
+  './favicon.png',
+  './char1.webp',
+  './char2.webp',
+  './char3.webp',
+  './char4.webp'
 ];
 
 self.addEventListener('install', e=>{

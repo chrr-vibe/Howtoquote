@@ -50,7 +50,35 @@
   .cat{width:72px;height:30px;flex:0 0 auto;margin-bottom:3px;
     background:url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAGAAAAAKCAYAAABL91sEAAAAn0lEQVR4nO2TMQ6AIBAEgVhS+BTfwYN9h0+xoMdGE4LcIbgXQ2Qai4uzix5KnVhrgyLgZk8Z/jymJEKUH36aCS283vfea24uRW/9zVPpm+Dhp7ndgJYQaltq+aPfUIOW4NL1feuX4sv+kB9QCkH798WF+In2S0D11+jw3Pag/LF7X1yYt7X7/rAbkAZIIL2lX/TX3LAW7gDoj5dm9dr/AFQlgqXlM92YAAAAAElFTkSuQmCC) 0 0/400% 100% no-repeat;
     image-rendering:pixelated;image-rendering:crisp-edges;}
-  .themes{display:flex;gap:8px;flex-wrap:wrap;}
+  .copy{max-width:1000px;margin:34px auto 0;text-align:center;font-size:11.5px;line-height:1.8;color:rgba(0,0,0,.38);}
+  .copy p{margin:0;}
+  .themes{display:flex;gap:8px;flex-wrap:wrap;align-items:center;}
+  .star-btn{border:none;background:transparent;padding:6px;margin-left:4px;display:flex;transition:transform .25s;}
+  .star-btn svg{width:30px;height:30px;fill:var(--ink);display:block;}
+  .star-btn:hover{transform:rotate(18deg) scale(1.08);}
+  .star-btn:active{transform:scale(.9);}
+
+  /* ───── Random quote pop-up ───── */
+  .pop{position:fixed;inset:0;z-index:60;display:none;align-items:center;justify-content:center;background:rgba(0,0,0,.28);}
+  .pop.open{display:flex;}
+  .pop-stage{position:relative;width:340px;height:350px;max-width:94vw;}
+  .pop-char{position:absolute;left:0;bottom:0;height:292px;width:auto;
+    filter:drop-shadow(0 4px 10px rgba(0,0,0,.18));
+    animation:charIn .35s cubic-bezier(.2,.9,.3,1.2) both;}
+  .pop-bubble{position:absolute;left:156px;top:0;width:182px;min-height:118px;
+    display:flex;align-items:center;justify-content:center;text-align:center;
+    background:var(--accent);color:#000;padding:16px 14px;
+    font-size:14px;line-height:1.7;word-break:keep-all;overflow-wrap:anywhere;
+    animation:bubbleIn .25s .18s ease-out both;}
+  .pop-bubble::after{content:"";position:absolute;left:-14px;bottom:18px;
+    border-style:solid;border-width:0 14px 14px 0;border-color:transparent var(--accent) transparent transparent;}
+  @keyframes charIn{from{opacity:0;transform:translateY(24px)}to{opacity:1;transform:none}}
+  @keyframes bubbleIn{from{opacity:0;transform:scale(.85);transform-origin:left bottom}to{opacity:1;transform:none}}
+  @media (max-width:360px){
+    .pop-stage{width:300px;height:310px;}
+    .pop-char{height:255px;}
+    .pop-bubble{left:132px;width:166px;font-size:13px;}
+  }
   .theme-btn{
     display:flex;align-items:center;gap:7px;border:2px solid var(--accent);background:transparent;color:var(--ink);
     border-radius:999px;padding:10px 22px 10px 14px;font-family:var(--title);font-size:18px;font-weight:700;transition:background .2s;
@@ -156,8 +184,12 @@
     body{padding:10px 10px 40px;}
     .topbar{margin:14px 0 24px;}
     .logo{font-size:26px;}
-    .theme-btn{font-size:16px;padding:9px 16px 9px 11px;}
-    .theme-btn.plain{padding:9px 16px;}
+    .themes{gap:6px;}
+    .theme-btn{font-size:15px;padding:8px 13px 8px 10px;gap:6px;}
+    .theme-btn i{width:15px;height:15px;}
+    .theme-btn.plain{padding:8px 14px;}
+    .star-btn{margin-left:0;padding:4px;}
+    .star-btn svg{width:26px;height:26px;}
     .title-row{gap:10px;}
     .cat{width:60px;height:25px;}
     .tab{font-size:12px;padding:12px 2px;}
@@ -181,6 +213,7 @@
       <button class="theme-btn" data-t="lukas"><i style="background:#FF6B9A"></i>Lukas</button>
       <button class="theme-btn" data-t="leonard"><i style="background:#ABD3DB"></i>Leonard</button>
       <button class="theme-btn plain" id="backupOpen" aria-haspopup="dialog">Backup</button>
+      <button class="star-btn" id="starBtn" aria-label="Show a random saved quote"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 0C12.8 7 17 11.2 24 12C17 12.8 12.8 17 12 24C11.2 17 7 12.8 0 12C7 11.2 11.2 7 12 0Z"/></svg></button>
     </div>
   </div>
 
@@ -203,6 +236,11 @@
     </div>
   </div>
 </div>
+
+<footer class="copy">
+  <p>© 카카오페이지 《마법명가 차남으로 살아남는 법》</p>
+  <p>캐릭터 © 나나곰 바게트</p>
+</footer>
 
 <!-- Read & confirm -->
 <div class="overlay" id="overlay">
@@ -249,6 +287,14 @@
     <p class="hint b-note" id="backupNote" role="status"></p>
     <input type="file" id="importFile" accept="application/json,.json" hidden>
     <div class="b-close"><button class="pill-btn solid" id="backupClose">Close</button></div>
+  </div>
+</div>
+
+<!-- Random quote pop-up -->
+<div class="pop" id="pop" role="dialog" aria-modal="true" aria-label="Random quote">
+  <div class="pop-stage">
+    <img class="pop-char" id="popChar" alt="">
+    <div class="pop-bubble" id="popBubble"></div>
   </div>
 </div>
 
@@ -587,6 +633,36 @@ function catAnimate(t){
   requestAnimationFrame(catAnimate);
 }
 requestAnimationFrame(t=>{ catNext = t + CAT_SPEED; requestAnimationFrame(catAnimate); });
+
+/* ───── Star: random character + random quote ───── */
+const CHAR_SRC = ['char1.webp','char2.webp','char3.webp','char4.webp'];
+const BUBBLE_MAX = 20;   // characters shown before …
+CHAR_SRC.forEach(src=>{ const i=new Image(); i.src=src; });   // preload
+let lastChar=-1, lastQuote=null;
+function pickOther(n, last){ if(n<2) return 0; let i; do{ i=Math.floor(Math.random()*n); }while(i===last); return i; }
+function shorten(text){
+  const chars = Array.from(text.replace(/\s+/g,' ').trim());
+  return chars.length>BUBBLE_MAX ? chars.slice(0,BUBBLE_MAX).join('').trimEnd()+'…' : chars.join('');
+}
+function showPop(){
+  lastChar = pickOther(CHAR_SRC.length, lastChar);
+  const img = $('popChar'), bub = $('popBubble');
+  img.src = CHAR_SRC[lastChar];
+  const pool = quotes.filter(q=>q.text && q.text.trim());
+  let line = 'No quotes saved yet.';
+  if(pool.length){
+    const others = pool.length>1 ? pool.filter(q=>q.id!==lastQuote) : pool;
+    const q = others[Math.floor(Math.random()*others.length)];
+    lastQuote = q.id; line = shorten(q.text);
+  }
+  bub.textContent = line;
+  [img,bub].forEach(el=>{ el.style.animation='none'; void el.offsetWidth; el.style.animation=''; });  // replay
+  $('pop').classList.add('open');
+}
+function closePop(){ $('pop').classList.remove('open'); }
+$('starBtn').onclick = showPop;
+$('pop').addEventListener('click', closePop);
+document.addEventListener('keydown', e=>{ if(e.key==='Escape' && $('pop').classList.contains('open')) closePop(); });
 
 /* ───── Start ───── */
 (async function init(){
