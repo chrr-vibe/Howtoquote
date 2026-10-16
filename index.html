@@ -172,12 +172,23 @@
   .overlay.open{display:flex;}
   .modal{width:min(520px,100%);max-height:92vh;overflow:auto;background:var(--bg);border:2px solid var(--accent);border-radius:0;padding:22px;}
   .modal h2{margin:0;font-size:20px;}
-  .modal.backup{width:min(440px,100%);text-align:center;padding:26px 22px 22px;}
-  .modal.backup h2{margin:0 0 8px;font-family:var(--title);font-size:24px;font-weight:700;}
-  .modal.backup .hint{margin:0 auto;max-width:30em;font-size:14px;line-height:1.6;}
-  .b-actions{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin-top:16px;}
-  .b-note{min-height:1.6em;margin-top:10px !important;}
-  .b-close{margin-top:10px;}
+  .modal.backup{position:relative;width:min(460px,100%);text-align:center;padding:28px 24px 30px;}
+  .modal.backup h2{margin:0 0 10px;font-family:var(--title);font-size:26px;font-weight:700;}
+  .modal.backup .hint{margin:0 auto;max-width:30em;font-size:14px;line-height:1.7;}
+  .b-x{position:absolute;top:14px;right:14px;width:40px;height:40px;border:none;background:transparent;
+    display:flex;align-items:center;justify-content:center;transition:background .2s;}
+  .b-x:hover{background:var(--wash);}
+  .b-x svg{width:20px;height:20px;stroke:var(--ink);stroke-width:2;}
+  .b-actions{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;margin-top:20px;}
+  .b-actions .pill-btn{padding:10px 20px;font-size:15px;white-space:nowrap;}
+  @media (max-width:420px){
+    .modal.backup{padding:28px 16px 28px;}
+    .b-actions{gap:8px;}
+    .b-actions .pill-btn{padding:9px 13px;font-size:13.5px;}
+  }
+  .b-note{margin-top:12px !important;}
+  .b-note:empty{display:none;}
+  #backupOpen[aria-expanded="true"]{background:var(--wash);}
   .m-top{display:flex;justify-content:space-between;align-items:baseline;gap:10px;margin-bottom:14px;}
   .m-top .count{white-space:nowrap;}
   label.f{display:block;font-size:13px;font-weight:700;margin:12px 0 5px;}
@@ -289,6 +300,7 @@
 <!-- Backup -->
 <div class="overlay" id="backupOverlay">
   <div class="modal backup" role="dialog" aria-modal="true" aria-labelledby="bTitle">
+    <button class="b-x" id="backupClose" aria-label="Close"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M3 3L17 17M17 3L3 17"/></svg></button>
     <h2 id="bTitle">Backup</h2>
     <p class="hint">Save your quotes and theme to a file, or bring them back from one.</p>
     <div class="b-actions">
@@ -297,7 +309,6 @@
     </div>
     <p class="hint b-note" id="backupNote" role="status"></p>
     <input type="file" id="importFile" accept="application/json,.json" hidden>
-    <div class="b-close"><button class="pill-btn solid" id="backupClose">Close</button></div>
   </div>
 </div>
 
@@ -591,8 +602,8 @@ document.addEventListener('keydown',e=>{ if(e.key==='Escape' && $('overlay').cla
 
 /* ───── Backup ───── */
 const bOverlay = $('backupOverlay');
-function openBackup(){ $('backupNote').textContent=''; bOverlay.classList.add('open'); $('exportBtn').focus(); }
-function closeBackup(){ bOverlay.classList.remove('open'); $('backupOpen').focus(); }
+function openBackup(){ $('backupNote').textContent=''; bOverlay.classList.add('open'); $('backupOpen').setAttribute('aria-expanded','true'); $('exportBtn').focus(); }
+function closeBackup(){ bOverlay.classList.remove('open'); $('backupOpen').setAttribute('aria-expanded','false'); $('backupOpen').focus(); }
 $('backupOpen').onclick = openBackup;
 $('backupClose').onclick = closeBackup;
 bOverlay.addEventListener('click', e=>{ if(e.target===bOverlay) closeBackup(); });
